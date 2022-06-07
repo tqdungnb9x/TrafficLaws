@@ -22,7 +22,6 @@ import { RouterName } from '../Navigator/RouterName';
 import { Colors } from '../Theme';
 import { getData, storeData } from '../Utils/storage';
 import BottomMenu from './BottomMenu';
-import HeaderWithBack from './HeaderWithBack';
 import IndexItem from './IndexItem';
 import QuestionItem from './QuestionItem';
 const windowWidth = Dimensions.get('window').width;

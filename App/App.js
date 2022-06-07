@@ -12,7 +12,6 @@ import {
   SafeAreaView,
   ScrollView,
   StatusBar,
-
   useColorScheme,
   View,
   Dimensions,
@@ -25,9 +24,9 @@ import QuestionsContent from './Containers/QuestionsContent';
 import { Colors } from './Theme';
 import BottomMenu from './Containers/BottomMenu';
 import TipsPractice from './Containers/TipsPractice';
+import { removeItem } from './Utils/storage';
 
 const App = () => {
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar barStyle={'default'} backgroundColor={Colors.barGreen} />

@@ -30,7 +30,7 @@ class IndexMenuItem extends Component {
     }
     render() {
         const itemWidth = windowWidth / 6 - 10
-        const { item, setIndex, selected } = this.props
+        const { item, setIndex, selected, index } = this.props
         // console.log("IndexMenuItem", item.index, selected);
         let color
         if (item.isCorrect === null) {
@@ -45,7 +45,7 @@ class IndexMenuItem extends Component {
         return (
             <TouchableOpacity
                 style={{ ...selected ? styles.selected : styles.unselected, borderWidth: 5, backgroundColor: color, margin: 5, borderRadius: itemWidth / 2, width: itemWidth, height: itemWidth, justifyContent: 'center', alignItems: 'center' }}
-                onPress={() => setIndex(item.index)}
+                onPress={() => setIndex(index)}
             >
                 <Text style={{ fontSize: 15 }}>{item.index + 1}</Text>
                 {/* {item.answer != 100 && <View

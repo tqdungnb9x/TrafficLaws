@@ -1,27 +1,27 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
-import React, { Component } from 'react';
+import { Colors, Fonts, Images, Strings } from '../Theme';
+import { Image, StyleSheet, Text, View, Dimensions, TouchableOpacity } from 'react-native';
+import React, { Component, PureComponent } from 'react';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { TouchableOpacity } from 'react-native-gesture-handler';
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
-class HeaderWithBack extends Component {
+class HeaderWithBack extends PureComponent {
     goBack = () => {
         const { navigation } = this.props
+        console.log('back');
         navigation.pop()
     }
 
     render() {
-        const {title, callBack = this.goBack} = this.props;
+        const {title, indexQuestion} = this.props;
         return (
-            <View style={{ flexDirection: 'row', height: 70, width: '75%'}}>
-                <TouchableOpacity onPress={callBack}>
-                    <View style={{justifyContent:'center', width: 50, height: 70, alignItems:'center'}}>
-                        <Image style={{width:24, height: 24}} source={Images.iconArrowLeft}/>
-                        
-                    </View>
+            <View style={{ flexDirection: 'row', height: 60, alignItems:'center', width: windowWidth, backgroundColor: Colors.barGreen, paddingHorizontal: 5}}>
+                <TouchableOpacity style={{ justifyContent:'center', alignItems: 'flex-start', width: 50}} onPress={() => this.goBack()}>
+                    <Icon name={"arrow-left"} size={30} color={'white'} />
                 </TouchableOpacity>
-                <View style={{justifyContent:'center', height: 70, alignItems:'flex-start'}}>
-                    <Text numberOfLines={1} style={styles.signUpText}>{title}</Text>
-                </View>
+                <Text numberOfLines={1} style={{fontSize: 18, color: 'white', flex: 1, paddingRight: 20}}>{title}</Text>
+                {!!indexQuestion && <Text numberOfLines={1} style={{fontSize: 16, color: 'white',}}>Câu {indexQuestion}</Text>}
             </View>
         );
     }
@@ -29,9 +29,8 @@ class HeaderWithBack extends Component {
 
 const styles = StyleSheet.create({
     signUpText: {
-        fontFamily: Fonts.family.Medium,
-        fontSize: 22,
-        color: Colors.darkGrey,
+        fontSize: 18,
+        color: 'white',
     },
 });
 

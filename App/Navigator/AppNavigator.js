@@ -5,14 +5,18 @@ import Home from '../Containers/Home';
 import QuestionsContent from '../Containers/QuestionsContent';
 import TipsTheory from '../Containers/TipsTheory';
 import TipsPractice from '../Containers/TipsPractice';
-
-
+import ListQuestion from '../Containers/ListQuestion';
+import { RouterName } from './RouterName';
+import ContestList from '../Containers/ContestList';
+import Contest from '../Containers/Contest';
+import ContestResult from '../Containers/ConstestResult';
+import { navigator } from './NavigationService';
 
 const Stack = createStackNavigator();
 
 function AppNavigator() {
     return (
-        <NavigationContainer>
+        <NavigationContainer ref={navigator}>
             <Stack.Navigator
                 initialRouteName="Home"
                 screenOptions={{
@@ -22,27 +26,65 @@ function AppNavigator() {
                 }}
             >
                 <Stack.Screen
-                    name="Home"
+                    name={RouterName.Home}
                     component={Home}
                     options={{
                         title: 'Home',
+                        headerShown: false
                     }}
                 />
                 <Stack.Screen
-                    name="AllQuestion"
+                    name={RouterName.AllQuestion}
                     component={QuestionsContent}
-
+                    options={{
+                        title: '600 câu GPLX',
+                        headerShown: false
+                    }}
                 />
                 <Stack.Screen
-                    name="TipsTheory"
+                    name={RouterName.TipsTheory}
                     component={TipsTheory}
-
+                    options={{
+                        title: 'Các mẹo ghi nhớ',
+                        
+                    }}
                 />
                 <Stack.Screen
-                    name="TipsPractice"
+                    name={RouterName.TipsPractice}
                     component={TipsPractice}
                     options={{
-                        title: 'Mẹo làm bài thi ',
+                        title: 'Mẹo làm bài thi',
+                    }}
+                />
+                <Stack.Screen
+                    name={RouterName.ListQuestion}
+                    component={ListQuestion}
+                    options={{
+                        title: 'Ôn tập câu hỏi',
+                    }}
+                />
+                <Stack.Screen
+                    name={RouterName.ContestList}
+                    component={ContestList}
+                    options={{
+                        title: 'On tap de thi',
+                        headerShown: false
+                    }}
+                />
+                <Stack.Screen
+                    name={RouterName.Contest}
+                    component={Contest}
+                    options={{
+                        title: 'Man hinh de thi',
+                        headerShown: false
+                    }}
+                />
+                <Stack.Screen
+                    name={RouterName.ContestResult}
+                    component={ContestResult}
+                    options={{
+                        title: 'Ket qua de thi',
+                        headerShown: false
                     }}
                 />
             </Stack.Navigator>
