@@ -11,33 +11,51 @@ import {
     useColorScheme,
     View,
     Dimensions,
-    Button
+    Button,
+    Image,
+    ImageBackground
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 // import { Colors } from "../Theme/Colors";
 import Constants from '../Constants';
 import { Colors } from '../Theme';
-import { getData, storeData } from '../Utils/storage';
+import { getData, storeData, storeProgress } from '../Utils/storage';
 import { areEqualShallow } from '../Utils/logic';
 import _, { debounce } from 'lodash';
+import Images from '../Theme/Images';
+
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
-const Answer = ({ answer, index, selectedAnswer, correct, onAnswer }) => {
-    var color, iconName, check;
-    if (selectedAnswer == index) {
-        if (index == correct) {
-            iconName = "numeric-" + index + "-circle"
-            color = Colors.green
-            check = "check"
+const Answer = ({ answer, index, selectedAnswer, correct, onAnswer, type }) => {
+    var color, iconColor, iconName, check;
+    if (type.length < 5 || type.length > 12) {
+        if (selectedAnswer == index) {
+            if (index == correct) {
+                iconName = "numeric-" + index + "-circle"
+                color = Colors.green
+                iconColor = Colors.green
+                check = "check"
+            } else {
+                iconName = "numeric-" + index + "-circle"
+                color = Colors.red
+                iconColor = Colors.red
+                check = "close"
+            }
         } else {
-            iconName = "numeric-" + index + "-circle"
-            color = Colors.red
-            check = "close"
+            iconName = "numeric-" + index + "-circle-outline"
+            color = Colors.black
+            iconColor = Colors.black
+            check = ""
         }
     } else {
-        iconName = "numeric-" + index + "-circle-outline"
+        if (selectedAnswer == index) {
+            iconName = "numeric-" + index + "-circle"
+            iconColor = Colors.yellow
+        } else {
+            iconName = "numeric-" + index + "-circle-outline"
+        }
         color = Colors.black
         check = ""
     }
@@ -67,7 +85,7 @@ const Answer = ({ answer, index, selectedAnswer, correct, onAnswer }) => {
     return (
         <TouchableNativeFeedback onPress={onDebouncePress} >
             <View style={{ flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: Colors.borderColorBox, paddingVertical: 5 }} >
-                <Icon style={{ marginRight: 5 }} name={iconName} size={30} color={color} />
+                <Icon style={{ marginRight: 5 }} name={iconName} size={30} color={iconColor} />
                 <Text style={{ ...styles.answerText, flex: 1, color: color }}>
                     {answer}
                 </Text>
@@ -78,7 +96,6 @@ const Answer = ({ answer, index, selectedAnswer, correct, onAnswer }) => {
         </TouchableNativeFeedback>
     )
 }
-
 class QuestionItem extends Component {
     shouldComponentUpdate(nextProps, nextState) {
         return !_.isEqual(nextState.selectedAnswer, this.state.selectedAnswer)
@@ -87,7 +104,8 @@ class QuestionItem extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedAnswer: this.props.storeAnswer
+            selectedAnswer: this.props.storeAnswer,
+            imageHeight: undefined
         }
     }
 
@@ -99,11 +117,11 @@ class QuestionItem extends Component {
     // }
 
     render() {
-        const { item, storeData, index } = this.props
+        const { item, storeData, index, type } = this.props
+        const { width, height } = (item.image !== null) ? Image.resolveAssetSource(Images[item.image.replace('.png', '')]) : { undefined, undefined }
         const { selectedAnswer } = this.state
+        let isSaveProgress = 0
         let answer, length
-        // console.log("QuestionItem", index);
-
         if (item.a4 !== null) {
             length = 4
         } else if (item.a3 !== null) {
@@ -113,25 +131,41 @@ class QuestionItem extends Component {
         if (item.answer > length) {
             answer = length
         } else answer = item.answer
-        
-
+        let questionColor = type.length < 5 || type.length > 12 ? item.i === 1 ? Colors.linearRed : Colors.darkGrey : Colors.darkGrey
         const onSelectAnswer = async (number) => {
-            this.setState({ selectedAnswer: number })
-            console.log('check', number, number == answer, index);
-            storeData(number, number == answer, index)
+            if (selectedAnswer === number) {
+                this.setState({ selectedAnswer: 0 })
+                storeData(0, null, index, -1)
+                // storeProgress(this.props.type, -1)
+            } else {
+                if (selectedAnswer === 0) {
+                    storeData(number, number == answer, index, 1)
+                    // storeProgress(this.props.type, 1)
+                } else {
+                    storeData(number, number == answer, index, 0)
+                }
+                this.setState({ selectedAnswer: number })
+            }
         }
 
         return (
-            <ScrollView style={{ width: windowWidth - 20, margin: 10, flexDirection: 'column' }}>
-                <Text style={{ ...styles.questionText, borderBottomWidth: 1, borderBottomColor: Colors.borderColorBox, paddingBottom: 10, }}>
+            <ScrollView style={{ width: windowWidth - 20, margin: 10, marginBottom: 60, flexDirection: 'column', }}>
+                <Text style={{ ...styles.questionText, color: questionColor, borderBottomWidth: 1, borderBottomColor: Colors.borderColorBox, paddingBottom: 10, }}>
                     {item.index}. {item.question}
                 </Text>
-                <View />
-                <Answer answer={item.a1} index={1} selectedAnswer={selectedAnswer} correct={answer} onAnswer={() => onSelectAnswer(1)} />
-                {item.a2 !== null && <Answer answer={item.a2} index={2} selectedAnswer={selectedAnswer} correct={answer} onAnswer={() => onSelectAnswer(2)} />}
-                {item.a3 !== null && <Answer answer={item.a3} index={3} selectedAnswer={selectedAnswer} correct={answer} onAnswer={() => onSelectAnswer(3)} />}
-                {item.a4 !== null && <Answer answer={item.a4} index={4} selectedAnswer={selectedAnswer} correct={answer} onAnswer={() => onSelectAnswer(4)} />}
-                {selectedAnswer == item.answer && <View style={{ marginTop: 10, padding: 10, borderWidth: 1, borderRadius: 6, borderColor: Colors.green }}>
+                {(item.image !== null) && <Image
+                    style={{
+                        width: windowWidth - 20,
+                        height: (windowWidth - 20) * height / width,
+                    }}
+                    resizeMode="contain"
+                    source={Images[item.image.replace('.png', '')]} />}
+
+                <Answer type={type} answer={item.a1} index={1} selectedAnswer={selectedAnswer} correct={answer} onAnswer={() => onSelectAnswer(1)} />
+                {item.a2 !== null && <Answer type={type} answer={item.a2} index={2} selectedAnswer={selectedAnswer} correct={answer} onAnswer={() => onSelectAnswer(2)} />}
+                {item.a3 !== null && <Answer type={type} answer={item.a3} index={3} selectedAnswer={selectedAnswer} correct={answer} onAnswer={() => onSelectAnswer(3)} />}
+                {item.a4 !== null && <Answer type={type} answer={item.a4} index={4} selectedAnswer={selectedAnswer} correct={answer} onAnswer={() => onSelectAnswer(4)} />}
+                {(selectedAnswer == item.answer && type.length < 5 || type.length > 12) && <View style={{ marginTop: 10, padding: 10, borderWidth: 1, borderRadius: 6, borderColor: Colors.green }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }} >
                         <Icon name={"lightbulb-on"} size={30} color={Colors.green} />
                         <Text style={styles.questionText}>Đáp án đúng: {item.answer}</Text>
@@ -168,7 +202,7 @@ const styles = StyleSheet.create({
     questionText: {
         fontSize: 18,
         fontWeight: "900",
-        color: 'black',
+        // color: 'black',
     },
     answerText: {
         fontSize: 18,

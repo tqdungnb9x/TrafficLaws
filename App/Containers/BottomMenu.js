@@ -60,17 +60,16 @@ class BottomMenu extends React.Component {
     }
 
     setIndex = (index) =>{
-        if(index < 0) return
         this.props.setIndex(index)
     }
     keyExtractor = item => `${item.index}`
 
-    renderItem = ({ item }) => {
+    renderItem = ({ item, index }) => {
         return (
             <IndexMenuItem
-                selected={item.index == this.props.indexQuestion}
+                selected={index === this.props.indexQuestion}
                 setIndex={this.setIndex}
-                index={item.index}
+                index={index}
                 item={item}
             />
         );
@@ -80,7 +79,7 @@ class BottomMenu extends React.Component {
         const { hidden } = this.state
         const { data, indexQuestion } = this.props
         const itemWidth = windowWidth / 6 - 10
-        console.log('render Bottom Menu', indexQuestion, data[0]);
+        // console.log('render Bottom Menu', indexQuestion, data[0]);
 
         return (
             <View
@@ -92,11 +91,13 @@ class BottomMenu extends React.Component {
                         <Icon name={"chevron-left"} size={30} color={'white'} />
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={{ flex: 1, flexDirection: 'row', borderLeftWidth: 1, borderRightWidth: 1, borderColor: Colors.borderColorBox, justifyContent: 'center' }} onPress={() => { this._toggleSubview() }}>
+                    <TouchableOpacity 
+                    style={{ flex: 1, flexDirection: 'row', borderLeftWidth: 1, borderRightWidth: 1, borderColor: Colors.borderColorBox, justifyContent: 'center' }} 
+                    onPress={() => { this._toggleSubview() }}>
                         <Icon name={hidden ? "chevron-up" : "chevron-down"} size={30} color={'white'} />
-                        <Text style={styles.buttonText}>{"  Câu số "+ (indexQuestion + 1)}</Text>
+                        <Text style={styles.buttonText}>{"Câu số "+ (data[indexQuestion].index + 1)}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={{ width: 60, alignItems: 'center' }} >
+                    <TouchableOpacity onPress={() => this.setIndex(indexQuestion+1)} style={{ width: 60, alignItems: 'center' }} >
                         <Icon name={"chevron-right"} size={30} color={'white'} />
                     </TouchableOpacity>
                 </View>
